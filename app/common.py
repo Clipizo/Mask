@@ -68,9 +68,10 @@ MODEL_FILES = {
     "sam2_image_large_coreml.onnx": (909605347, "7b0dcb07c64e0cd3879c9adb581caf93cb5ded5859c90897b64a2e9fe379af71"),
     "sam2_track_small_coreml.onnx": (226999585, "3a2dadf24f814d0b517b09df33529717f7257afea6a6cda74021b9d85aad8278"),
 }
-# Where the installer and the app download models from: <base>/<file name>. Not published yet;
-# until then they come from an installed Maskizo, or `mask download --from FOLDER` copies them.
-MODEL_BASE_URL = os.environ.get("MASK_MODEL_URL", "")
+# Where the installer and the app download models from: <base>/<file name>. Clipizo's Cloudflare R2
+# bucket `clipizo` through its r2.dev address (a custom domain is the production route; change it
+# only here). MASK_MODEL_URL overrides it. An installed Maskizo with the same files is used first.
+MODEL_BASE_URL = os.environ.get("MASK_MODEL_URL", "https://pub-b100959e888f4b8cb607e262182f9a07.r2.dev/mask/models/v1")
 
 
 def model_set(settings: dict) -> str:

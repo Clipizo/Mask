@@ -10,7 +10,7 @@ This repository contains only Mask's own files. It does **not** include the AI m
 |---|---|---|---|
 | SAM 2.1 (hiera tiny, small and large) | Meta | Apache License 2.0 | https://github.com/facebookresearch/sam2 |
 
-Mask downloads copies of these models that Clipizo converted to the ONNX format (the image models for clicking, and the video tracker), in half precision for Windows graphics cards and in full precision for Macs and processors. The conversion changes the file format and the precision, not what the models were trained to do. The converted files stay under the Apache License 2.0.
+Mask downloads copies of these models that Clipizo converted to the ONNX format (the image models for clicking, and the video tracker), in half precision for Windows graphics cards and in full precision for Macs and processors. The conversion changes the file format, the precision and the graph layout, not what the models were trained to do. The converted files stay under the Apache License 2.0 (Copyright (c) Meta Platforms, Inc. and affiliates): its full text is in `licenses/SAM-2.1-LICENSE.txt`, and `licenses/MODELS-README.txt` lists the files. Both are also in the folder Mask downloads the models from, `https://pub-b100959e888f4b8cb607e262182f9a07.r2.dev/mask/models/v1/` (`LICENSE.txt` and `README.txt`).
 
 ## Main software
 

@@ -178,6 +178,8 @@ Mask uses Meta's **SAM 2.1** models, converted for ONNX Runtime by Clipizo. **Yo
 
 On Windows with a graphics card, the installer also gets the processor versions (the right column) of tracking and Balanced, in case the card can't run them. `./mask download all` gets every quality, for example before you go offline. Better runs only on a graphics card or a Mac's GPU, because on the processor it takes about half a minute per click.
 
+They download from Clipizo's storage on Cloudflare (`https://pub-b100959e888f4b8cb607e262182f9a07.r2.dev/mask/models/v1/`, with their license and a list of the files), and Mask checks every file before using it.
+
 **Have Maskizo?** If Clipizo's Maskizo plugin for DaVinci Resolve is installed on the computer, Mask copies the models from it instead of downloading them.
 
 **To copy the models from another computer** (for example, if your network blocks the download), copy the `models` folder to a USB stick, then run `./mask download all --from E:\models` (with your own path). It copies the files this computer needs and tells you which ones the folder doesn't have.
@@ -205,6 +207,7 @@ Open PowerShell (Windows) or Terminal (Mac and Linux), go into the Mask folder a
 | `AGENTS.md`, `SKILL.md` | Instructions for AI agents. `CLAUDE.md` and `GEMINI.md` point to them. |
 | `app/` | The Mask program. |
 | `tests/` | Mask's own tests. |
+| `licenses/` | The AI models' license (Apache 2.0, from Meta) and the list of model files. |
 | `output/` | Your masks and exports. |
 | `envs/`, `models/`, `.tools/` | Created by the installer: Python, the libraries and the AI models. |
 
