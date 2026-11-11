@@ -1,0 +1,8 @@
+# Mask's direct dependencies; app/requirements/mask.txt pins them and everything they need.
+gradio==6.8.0
+av==15.1.0
+imageio-ffmpeg==0.6.0
+numpy==2.4.2
+pillow==12.1.1
+onnxruntime==1.23.2 ; sys_platform != 'win32'
+onnxruntime-directml==1.23.0 ; sys_platform == 'win32'

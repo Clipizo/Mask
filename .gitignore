@@ -1,0 +1,23 @@
+# Installed by the installer (big, and specific to each computer)
+.tools/
+envs/
+models/
+install-log.txt
+/mask
+last-error.txt
+
+# Private notes for the people and agents working on the kit
+LLM_PROJECT_CONTEXT.md
+
+# Your own files stay out of the kit
+output/*
+!output/README.md
+
+# Python
+__pycache__/
+*.pyc
+
+# Operating systems
+.DS_Store
+Thumbs.db
+desktop.ini
