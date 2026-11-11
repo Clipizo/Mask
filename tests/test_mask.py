@@ -168,6 +168,28 @@ class Downloads(unittest.TestCase):
         finally:
             C.MODEL_FILES.pop("missing.onnx", None)
 
+    def fetch_with_maskizo(self, content: bytes, progress=None) -> Path:
+        """fetch_model with a stand-in for an installed Maskizo that has `content` as fake.onnx."""
+        folder = self.tmp / "maskizo"
+        folder.mkdir(exist_ok=True)
+        (folder / "fake.onnx").write_bytes(content)
+        saved = C.maskizo_models
+        C.maskizo_models = lambda: folder
+        try:
+            return C.fetch_model("fake.onnx", progress=progress)
+        finally:
+            C.maskizo_models = saved
+
+    def test_copies_from_an_installed_maskizo(self):
+        seen = []
+        path = self.fetch_with_maskizo(self.data, progress=lambda name, done, size: seen.append(done))
+        self.assertEqual(path.read_bytes(), self.data)
+        self.assertEqual(seen, [])  # copied, not downloaded
+
+    def test_another_maskizo_version_is_downloaded_instead(self):
+        path = self.fetch_with_maskizo(bytes(len(self.data)))  # the same size, other content
+        self.assertEqual(path.read_bytes(), self.data)
+
 
 BOX = (260, 120)  # width, height of the white box in the test video
 

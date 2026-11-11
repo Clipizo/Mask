@@ -399,9 +399,20 @@ def get_models(settings: dict, everything: bool, source: Path | None) -> None:
         return
     total = sum(C.MODEL_FILES[n][0] for n in names) / 1024**3
     log(f"  Getting {len(names)} model file(s), about {total:.1f} GB.")
+    if source is None and any(C.maskizo_model(n) for n in names):
+        log("  Maskizo is installed on this computer and has them: copying, no download needed.")
+    spare = []
     for name in names:
         log(f"  {name}")
-        C.fetch_model(name, source, None if source else C.console_progress)
+        try:
+            C.fetch_model(name, source, None if source else C.console_progress)
+        except C.UserError:
+            if not C.is_cpu_twin(settings, name):
+                raise
+            spare.append(name)
+    if spare:
+        log(f"  (The processor copies aren't here. {C.KIT_NAME} only needs them if the graphics card")
+        log("  can't run a model.)")
     log("  OK: the models are ready.")
 
 
@@ -490,7 +501,7 @@ def main() -> int:
 
         step(5, total, "Getting the AI models")
         source = Path(args.source).expanduser() if args.source else None
-        if source or C.MODEL_BASE_URL:
+        if source or C.MODEL_BASE_URL or C.maskizo_models():
             want = args.download or source is not None or (not args.no_download and not args.yes and ask_yes_no(
                 "Get the AI models now? (otherwise they come the first time you use them)", default=True,
                 assume_yes=False))
@@ -504,8 +515,7 @@ def main() -> int:
                         log(f"  That's OK: {C.KIT_NAME} gets them the first time they're needed. To get them now:")
                         log(f"    {C.launcher_command()} download")
         else:
-            log(f"  Skipped: the models aren't published for download yet. Copy them in with:")
-            log(f"    {C.launcher_command()} download --from FOLDER")
+            log("  Skipped: the models can't be downloaded yet (see the note below).")
     except InstallError as e:
         log("")
         log("!" * 60)
@@ -518,14 +528,25 @@ def main() -> int:
         log("\nInstall stopped. Run the installer again to continue where it stopped.")
         return 130
 
+    needed = [n for n in C.models_for(settings, ["Balanced"]) if not C.is_cpu_twin(settings, n)]
+    ready = all(C.model_is_downloaded(n) for n in needed)
     log("")
     log("=" * 60)
-    log(f"  {C.KIT_NAME} is installed!")
-    log("=" * 60)
-    if C.IS_WINDOWS:
-        log("Start it: double-click  mask.bat  in this folder. It opens in your browser.")
+    if ready or C.MODEL_BASE_URL:
+        log(f"  {C.KIT_NAME} is installed!")
     else:
-        log(f"Start it from Terminal, in this folder:  {C.launcher_command()}   (it opens in your browser)")
+        log(f"  {C.KIT_NAME} is installed, but it has no AI models yet.")
+    log("=" * 60)
+    if not ready and not C.MODEL_BASE_URL:
+        log("They can't be downloaded yet. Copy them in from a folder that has them (for example")
+        log(f"the models folder of {C.KIT_NAME} on another computer), in a terminal in this folder:")
+        log(f"  {C.launcher_command()} download all --from FOLDER")
+        log("")
+    start = "Start it" if ready or C.MODEL_BASE_URL else "Then start it"
+    if C.IS_WINDOWS:
+        log(f"{start}: double-click  mask.bat  in this folder. It opens in your browser.")
+    else:
+        log(f"{start} from Terminal, in this folder:  {C.launcher_command()}   (it opens in your browser)")
     if settings["backend"] == "cpu":
         log("")
         log("Note: no supported GPU, so the AI runs on the processor. It works, but tracking is slow")

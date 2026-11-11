@@ -69,7 +69,7 @@ MODEL_FILES = {
     "sam2_track_small_coreml.onnx": (226999585, "3a2dadf24f814d0b517b09df33529717f7257afea6a6cda74021b9d85aad8278"),
 }
 # Where the installer and the app download models from: <base>/<file name>. Not published yet;
-# until then, `mask download --from FOLDER` copies them from a folder (for example Maskizo's).
+# until then they come from an installed Maskizo, or `mask download --from FOLDER` copies them.
 MODEL_BASE_URL = os.environ.get("MASK_MODEL_URL", "")
 
 
@@ -109,16 +109,50 @@ def models_for(settings: dict, qualities=None, tracker: bool = True) -> list[str
     return list(dict.fromkeys(names))
 
 
+def is_cpu_twin(settings: dict, name: str) -> bool:
+    """A processor copy that a graphics-card setup only needs if the card can't run a model."""
+    return model_set(settings) == "gpu" and name.endswith("_coreml.onnx")
+
+
+def maskizo_models() -> Path | None:
+    """The models folder of an installed Maskizo (Clipizo's masking plugin for DaVinci Resolve).
+    It has the same files: the graphics-card ones on Windows, the Mac ones on a Mac."""
+    if IS_WINDOWS:
+        base = Path(os.environ.get("CommonProgramFiles", r"C:\Program Files\Common Files"))
+        folder = base / "OFX" / "Plugins" / "Maskizo.ofx.bundle" / "Contents" / "Win64" / "models"
+    elif IS_MAC:
+        folder = Path("/Library/OFX/Plugins/Maskizo.ofx.bundle/Contents/Resources/models")
+    else:
+        return None
+    return folder if folder.is_dir() else None
+
+
+def maskizo_model(name: str) -> Path | None:
+    """`name` in an installed Maskizo, if Maskizo has that file (the same size)."""
+    folder = maskizo_models()
+    found = folder / name if folder is not None else None
+    if found is not None and found.is_file() and found.stat().st_size == MODEL_FILES[name][0]:
+        return found
+    return None
+
+
 def fetch_model(name: str, source: Path | None = None, progress=None) -> Path:
-    """Copy a model from `source` (a folder) or download it from MODEL_BASE_URL, then check it.
-    progress(name, bytes done, bytes in all) is called as it goes. An interrupted download
-    continues where it stopped."""
+    """Copy a model from `source` (a folder) or from an installed Maskizo, or download it from
+    MODEL_BASE_URL, then check it. progress(name, bytes done, bytes in all) is called as a
+    download goes. An interrupted download continues where it stopped."""
     target = model_path(name)
     if model_is_downloaded(name):
         return target
     MODELS.mkdir(parents=True, exist_ok=True)
     partial = target.with_name(target.name + ".part")
     size, digest = MODEL_FILES[name]
+    local = maskizo_model(name) if source is None else None
+    if local is not None:
+        shutil.copyfile(local, partial)
+        if sha256_file(partial) == digest:
+            partial.replace(target)
+            return target
+        partial.replace(partial.with_name(partial.name + ".bad"))  # another version: download it instead
     if source is not None:
         found = Path(source) / name
         if not found.is_file():
@@ -135,7 +169,8 @@ def fetch_model(name: str, source: Path | None = None, progress=None) -> Path:
 
 def _download(name: str, partial: Path, size: int, progress=None, attempts: int = 5) -> None:
     if not MODEL_BASE_URL:
-        raise UserError("The AI models aren't published for download yet. Copy them in with\n"
+        raise UserError(f"{KIT_NAME}'s AI models aren't on this computer, and they can't be downloaded yet.\n"
+                        f"Copy them in from a folder that has them, in a terminal in the {KIT_NAME} folder:\n"
                         f"  {launcher_command()} download all --from FOLDER")
     import http.client
     import time

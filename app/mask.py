@@ -31,9 +31,13 @@ def cmd_check() -> int:
     where = {"directml": "the graphics card (DirectML)", "coreml": "the Mac's GPU (Core ML)", "cpu": "the processor"}
     C.say(f"  Runs on: {where.get(settings.get('backend'), settings.get('backend'))}")
     for quality in C.QUALITIES:
-        needed = C.models_for(settings, [quality])
+        needed = [n for n in C.models_for(settings, [quality]) if not C.is_cpu_twin(settings, n)]
         have = [n for n in needed if C.model_is_downloaded(n)]
         C.say(f"  {quality:9s} models: {'ready' if len(have) == len(needed) else f'{len(have)} of {len(needed)} files'}")
+    twins = [n for n in C.models_for(settings) if C.is_cpu_twin(settings, n)]
+    if twins:
+        have = [n for n in twins if C.model_is_downloaded(n)]
+        C.say(f"  Processor copies (used if the graphics card fails): {len(have)} of {len(twins)} files")
     return 0
 
 
@@ -45,14 +49,23 @@ def cmd_download(quality: str, source: str | None) -> int:
         C.say("The models are already here.")
         return 0
     folder = Path(source).expanduser() if source else None
-    missing = []
+    missing, spare = [], []
     for name in names:
         C.say(f"  {name} ({C.MODEL_FILES[name][0] / 1024**2:.0f} MB)")
+        twin = C.is_cpu_twin(settings, name)
         if folder is not None and not (folder / name).is_file():
-            missing.append(name)  # copy what the folder has, then say what it lacked
+            (spare if twin else missing).append(name)  # copy what the folder has, then say what it lacked
             C.say("    not in that folder")
             continue
-        C.fetch_model(name, folder, None if folder else C.console_progress)
+        try:
+            C.fetch_model(name, folder, None if folder else C.console_progress)
+        except C.UserError:
+            if not twin:
+                raise
+            spare.append(name)
+            C.say("    not available now")
+    if spare:
+        C.say(f"The processor copies aren't all here; {C.KIT_NAME} only needs them if the graphics card can't run a model.")
     if missing:
         C.say(f"{len(missing)} file(s) aren't in {folder}: {', '.join(missing)}.\n"
               "Copy them from a computer that has them, or download them.")

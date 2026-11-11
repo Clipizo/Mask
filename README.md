@@ -178,6 +178,8 @@ Mask uses Meta's **SAM 2.1** models, converted for ONNX Runtime by Clipizo. **Yo
 
 On Windows with a graphics card, the installer also gets the processor versions (the right column) of tracking and Balanced, in case the card can't run them. `./mask download all` gets every quality, for example before you go offline. Better runs only on a graphics card or a Mac's GPU, because on the processor it takes about half a minute per click.
 
+**Have Maskizo?** If Clipizo's Maskizo plugin for DaVinci Resolve is installed on the computer, Mask copies the models from it instead of downloading them.
+
 **To copy the models from another computer** (for example, if your network blocks the download), copy the `models` folder to a USB stick, then run `./mask download all --from E:\models` (with your own path). It copies the files this computer needs and tells you which ones the folder doesn't have.
 
 ## Commands

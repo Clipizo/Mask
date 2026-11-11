@@ -272,6 +272,7 @@ Mask uses Meta's SAM 2.1 models (Apache License 2.0), converted to the ONNX form
 
 - The installer gets Balanced and tracking. On Windows with a graphics card it also gets the processor versions of those two, in case the card can't run them.
 - Another quality downloads the first time the user picks it (a progress bar shows on the picture), or with `./mask download all`.
+- **From Maskizo:** if Clipizo's Maskizo plugin for DaVinci Resolve is installed on the computer, Mask copies the models from it instead of downloading them (on Windows, Maskizo has the graphics-card files; the processor copies then come only if they're ever needed).
 - Every file is checked (size and SHA-256) before it's used. An interrupted download continues where it stopped; a damaged one is set aside (as `.bad`), and the next try downloads it again.
 - **Copying instead of downloading:** copy the `models` folder of another Mask install (best from the same kind of computer: a Windows PC with a graphics card uses other files than a Mac) to a USB stick, then run `./mask download all --from <that folder>`. It copies the files this computer needs and lists the ones the folder doesn't have.
 
@@ -298,6 +299,7 @@ Mask uses Meta's SAM 2.1 models (Apache License 2.0), converted to the ONNX form
 | *"This Mac has an Intel processor"* | Intel Macs can't run Mask. Use a Mac with Apple Silicon, or a Windows or Linux PC. |
 | Mac: "permission denied" for `./mask` | Run `bash mask.sh` instead, or run the installer again (it fixes the permission). |
 | The installer ends with *"The models aren't all here yet"* | Nothing is broken: read the reason it gives. The models come the first time they're needed, or with `./mask download`. |
+| The installer ends with *"Mask is installed, but it has no AI models yet"* | The models can't be downloaded yet. Copy them in from a folder that has them (section 7): in a terminal in the Mask folder, `./mask download all --from FOLDER`. |
 
 **Using Mask:**
 
@@ -309,7 +311,7 @@ Mask uses Meta's SAM 2.1 models (Apache License 2.0), converted to the ONNX form
 | *"Open a video first"* | Drop a video on the page, or paste its path and press Enter. |
 | *"This file can't be opened as a video"* | The file is damaged or isn't a video. Convert it with another program (for example HandBrake) and open the copy. |
 | The first click takes several seconds | Normal: the model loads on the first click, and the tracker the first time you track. After that they stay loaded until you close Mask. |
-| *"The AI models aren't published for download yet"* or the model download fails | Check the internet and try again: downloads continue where they stopped. If the network blocks them, use `./mask download all --from FOLDER` with a folder that has the model files (section 7). |
+| *"Mask's AI models aren't on this computer, and they can't be downloaded yet"* or the model download fails | Check the internet and try again: downloads continue where they stopped. If the network blocks them, use `./mask download all --from FOLDER` with a folder that has the model files (section 7). |
 | *"The GPU couldn't load ..., using the CPU"* in the window | The graphics card couldn't run that model. Update the graphics driver and restart Mask. Mask keeps working on the processor (slower). |
 | Better quality says it uses Balanced | Better needs a graphics card or a Mac's GPU; on the processor Mask uses Balanced. |
 | Tracking is very slow | `./mask check` shows where Mask runs. On the processor, a few seconds per frame is normal: track shorter parts (In and Out), or use a computer with a graphics card. Close other programs that use the graphics card heavily. |
