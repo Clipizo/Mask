@@ -272,7 +272,7 @@ Mask uses Meta's SAM 2.1 models (Apache License 2.0), converted to the ONNX form
 
 - The installer gets Balanced and tracking. On Windows with a graphics card it also gets the processor versions of those two, in case the card can't run them.
 - Another quality downloads the first time the user picks it (a progress bar shows on the picture), or with `./mask download all`.
-- **Where they come from:** Clipizo's storage on Cloudflare, `https://pub-b100959e888f4b8cb607e262182f9a07.r2.dev/mask/models/v1/` (the folder also has the license, `LICENSE.txt`, and a list of the files, `README.txt`).
+- **Where they come from:** Clipizo's download address, `https://downloads.clipizo.com/mask/models/v1/`, which hands each file over from Clipizo's storage on Cloudflare (the folder also has the license, `LICENSE.txt`, and a list of the files, `README.txt`).
 - **From Maskizo:** if Clipizo's Maskizo plugin for DaVinci Resolve is installed on the computer, Mask copies the models from it instead of downloading them (on Windows, Maskizo has the graphics-card files; the processor copies then come only if they're ever needed).
 - Every file is checked (size and SHA-256) before it's used. An interrupted download continues where it stopped; a damaged one is set aside (as `.bad`), and the next try downloads it again.
 - **Copying instead of downloading:** copy the `models` folder of another Mask install (best from the same kind of computer: a Windows PC with a graphics card uses other files than a Mac) to a USB stick, then run `./mask download all --from <that folder>`. It copies the files this computer needs and lists the ones the folder doesn't have.
@@ -311,7 +311,7 @@ Mask uses Meta's SAM 2.1 models (Apache License 2.0), converted to the ONNX form
 | *"Open a video first"* | Drop a video on the page, or paste its path and press Enter. |
 | *"This file can't be opened as a video"* | The file is damaged or isn't a video. Convert it with another program (for example HandBrake) and open the copy. |
 | The first click takes several seconds | Normal: the model loads on the first click, and the tracker the first time you track. After that they stay loaded until you close Mask. |
-| *"... couldn't be downloaded"*, or the model download fails or is very slow | Check the internet and try again: downloads continue where they stopped. Some school, work or country networks block Cloudflare's `r2.dev` addresses: try another network, or copy the models from another computer with `./mask download all --from FOLDER` (section 7). |
+| *"... couldn't be downloaded"*, or the model download fails or is very slow | Check the internet and try again: downloads continue where they stopped. Some school, work or country networks block `downloads.clipizo.com` or Cloudflare's storage (`r2.cloudflarestorage.com`): try another network, or copy the models from another computer with `./mask download all --from FOLDER` (section 7). |
 | *"The GPU couldn't load ..., using the CPU"* in the window | The graphics card couldn't run that model. Update the graphics driver and restart Mask. Mask keeps working on the processor (slower). |
 | Better quality says it uses Balanced | Better needs a graphics card or a Mac's GPU; on the processor Mask uses Balanced. |
 | Tracking is very slow | `./mask check` shows where Mask runs. On the processor, a few seconds per frame is normal: track shorter parts (In and Out), or use a computer with a graphics card. Close other programs that use the graphics card heavily. |
