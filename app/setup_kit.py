@@ -238,6 +238,12 @@ def windows_runtime_missing() -> list[str]:
     return [n for n in ("msvcp140.dll", "vcruntime140.dll", "vcruntime140_1.dll") if not (system32 / n).exists()]
 
 
+def is_windows_dll_error(text: str) -> bool:
+    """A library failed to load on Windows: usually Microsoft's runtime is missing, too old or damaged."""
+    return C.IS_WINDOWS and any(k in text for k in ("WinError 126", "WinError 127", "WinError 1114",
+                                                    "DLL load failed", "vc_redist", "Visual C++"))
+
+
 def install_windows_runtime(assume_yes: bool) -> bool:
     """Download Microsoft's Visual C++ Redistributable and install it (Windows asks the user for
     permission). Returns False if it wasn't installed; the caller then explains the manual fix."""
@@ -342,6 +348,11 @@ def probe() -> dict:
     return {"error": (proc.stderr or proc.stdout)[-800:]}
 
 
+def load_problems(p: dict) -> list[str]:
+    """What failed to load in the probe, one line per library."""
+    return [f"{k[:-6]}: {v}" for k, v in p.items() if k.endswith("_error")] or ([p["error"]] if "error" in p else [])
+
+
 def make_settings(info: dict, p: dict) -> dict:
     providers = p.get("providers") or []
     if C.IS_WINDOWS and "DmlExecutionProvider" in providers:
@@ -425,8 +436,11 @@ def main() -> int:
         describe(info)
         check_supported(info)
         check_folder(args.yes)
-        if windows_runtime_missing() and not install_windows_runtime(args.yes):
-            log("WARNING: " + VC_REDIST_HELP)
+        runtime_tried = False
+        if windows_runtime_missing():
+            runtime_tried = True
+            if not install_windows_runtime(args.yes):
+                log("WARNING: " + VC_REDIST_HELP)
         free = info.get("disk_free_gb")
         if free is not None and free < 6:
             log(f"WARNING: only {free:.0f} GB free. {C.KIT_NAME} needs about 1 GB for the programs, up to")
@@ -441,8 +455,17 @@ def main() -> int:
 
         step(3, total, "Testing the installation")
         p = probe()
-        problems = [f"{k[:-6]}: {v}" for k, v in p.items() if k.endswith("_error")] or ([p["error"]] if "error" in p else [])
+        problems = load_problems(p)
+        if problems and is_windows_dll_error(" ".join(problems)) and not runtime_tried:
+            # Microsoft's runtime is there but too old or damaged: installing it again fixes that.
+            runtime_tried = True
+            log("  A library didn't load. Microsoft's Visual C++ component on this PC may be too old or damaged.")
+            if install_windows_runtime(args.yes):
+                p = probe()
+                problems = load_problems(p)
         if problems:
+            if is_windows_dll_error(" ".join(problems)):
+                raise InstallError(VC_REDIST_HELP + "\n(Details: " + problems[0][:300] + ")")
             raise InstallError("The installation doesn't load:\n  " + "\n  ".join(problems))
         missing = [e for e in ("libx264", "prores_ks", "libvpx-vp9") if e not in p.get("encoders", [])]
         log(f"  OK: Python {p.get('python')}, ONNX Runtime {p.get('onnxruntime')}, Gradio {p.get('gradio')}, PyAV {p.get('av')}")
@@ -475,7 +498,11 @@ def main() -> int:
                 try:
                     get_models(settings, args.all, source)
                 except C.UserError as e:
-                    log(f"  The models aren't ready: {e}")
+                    log("")  # a download's progress line may still be open
+                    log(f"  The models aren't all here yet: {e}")
+                    if C.MODEL_BASE_URL:
+                        log(f"  That's OK: {C.KIT_NAME} gets them the first time they're needed. To get them now:")
+                        log(f"    {C.launcher_command()} download")
         else:
             log(f"  Skipped: the models aren't published for download yet. Copy them in with:")
             log(f"    {C.launcher_command()} download --from FOLDER")
