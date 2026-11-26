@@ -63,7 +63,7 @@ cd C:\Mask
 ```powershell
 ./install-windows.bat
 ```
-It works through 5 steps. Don't click inside the window, because that pauses it (if the window's title starts with *Select*, press Esc). When it asks *"Get the AI models now?"*, press Enter. It's done when it says **Mask is installed!**, then *"Press any key to continue"*: press a key.
+It works through 5 steps. When it asks *"Get the AI models now?"*, press Enter. It's done when it says **Mask is installed!**, then *"Press any key to continue"*: press a key.
 
 **Step 7. Start Mask**
 ```powershell

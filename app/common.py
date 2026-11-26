@@ -245,12 +245,53 @@ def save_settings(data: dict) -> None:
 # ---------------------------------------------------------------------------
 
 def setup_console() -> None:
-    """Make printing safe on every console (no crashes on unusual characters)."""
+    """Make printing safe on every console (no crashes on unusual characters), and on Windows keep
+    a click inside the window from pausing Mask."""
     for stream in (sys.stdout, sys.stderr):
         try:
             stream.reconfigure(errors="replace")
         except (AttributeError, ValueError):
             pass
+    if IS_WINDOWS:
+        try:
+            quick_edit_off()
+        except Exception:  # noqa: BLE001  (the window then just keeps its usual behaviour)
+            pass
+
+
+# Windows' console window has "QuickEdit Mode" on by default: a click inside the window starts
+# selecting text, and until Esc ends the selection (the title then starts with "Select"), every
+# program in that window stops at its next line of output. Mask turns it off for its own window
+# through the console's documented setting (SetConsoleMode) while it runs, and puts it back when it
+# ends. It has to happen in the program that does the work: before each program a .bat starts,
+# cmd.exe puts back the setting the window had when the .bat started (app/bootstrap.ps1 covers the
+# installer's first part the same way). If it is already off, this leaves the window alone.
+# Windows Terminal ignores the setting: a click there never pauses anything.
+ENABLE_QUICK_EDIT_MODE = 0x0040
+ENABLE_EXTENDED_FLAGS = 0x0080
+
+
+def quick_edit_off() -> None:
+    import atexit
+    import ctypes
+    from ctypes import wintypes
+
+    k32 = ctypes.WinDLL("kernel32", use_last_error=True)
+    k32.CreateFileW.restype = wintypes.HANDLE
+    k32.CreateFileW.argtypes = (wintypes.LPCWSTR, wintypes.DWORD, wintypes.DWORD, wintypes.LPVOID,
+                                wintypes.DWORD, wintypes.DWORD, wintypes.HANDLE)
+    k32.GetConsoleMode.argtypes = (wintypes.HANDLE, ctypes.POINTER(wintypes.DWORD))
+    k32.SetConsoleMode.argtypes = (wintypes.HANDLE, wintypes.DWORD)
+    # CONIN$ is the window's keyboard and mouse input, also when stdin is redirected; it doesn't
+    # exist when there is no window (GENERIC_READ | GENERIC_WRITE, shared, OPEN_EXISTING).
+    handle = k32.CreateFileW("CONIN$", 0xC0000000, 3, None, 3, 0, None)
+    if not handle or handle == ctypes.c_void_p(-1).value:
+        return
+    mode = wintypes.DWORD()
+    if not k32.GetConsoleMode(handle, ctypes.byref(mode)) or not mode.value & ENABLE_QUICK_EDIT_MODE:
+        return
+    if k32.SetConsoleMode(handle, (mode.value | ENABLE_EXTENDED_FLAGS) & ~ENABLE_QUICK_EDIT_MODE):
+        atexit.register(k32.SetConsoleMode, handle, mode.value | ENABLE_EXTENDED_FLAGS)
 
 
 def say(text: str = "") -> None:

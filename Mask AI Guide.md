@@ -88,7 +88,7 @@ Many of these commands print nothing when they work; the next line starting with
    ./install-windows.bat
    ```
    - It shows the progress in 5 steps and takes 2 to 15 minutes. A download can look stuck for a minute; it isn't.
-   - **Don't click inside the window:** that pauses it (the title then starts with "Select"). If that happens, press Esc.
+   - Clicking inside the window doesn't pause it.
    - If Windows lacks a Microsoft component ONNX Runtime needs, the installer offers to install it: press Enter, then click **Yes** when Windows asks for permission.
    - At the end it offers to get the AI models now: press Enter for yes.
    - **Done** when it says **Mask is installed!**, followed by "Press any key to continue": press a key.
@@ -180,7 +180,7 @@ Running the installer again is always safe: it skips what is already done. Each 
 - **Windows:** double-click `mask.bat` in `C:\Mask`, or in PowerShell run `cd C:\Mask` and then `./mask`.
 - **Mac and Linux:** in Terminal, run `cd ~/Mask` and then `./mask`.
 
-The window shows `Mask is running at http://127.0.0.1:7861` and the browser opens that page (the number can differ if 7861 is taken). It runs only on this computer; nothing is uploaded. **Keep the window open while using Mask: closing it stops Mask.** On Windows, don't click inside that window either: it pauses Mask (the title starts with "Select"); press Esc. If the browser doesn't open by itself, open the address the window shows.
+The window shows `Mask is running at http://127.0.0.1:7861` and the browser opens that page (the number can differ if 7861 is taken). It runs only on this computer; nothing is uploaded. **Keep the window open while using Mask: closing it stops Mask.** Clicking inside it is fine. If the browser doesn't open by itself, open the address the window shows.
 
 **Open a terminal in the Mask folder** (for the commands in section 6):
 
@@ -292,7 +292,7 @@ Mask uses Meta's SAM 2.1 models (Apache License 2.0), converted to the ONNX form
 | *"Please run the installer without sudo"* | Run `bash install.sh` without `sudo`. If an earlier run with `sudo` left files the user can't change ("Permission denied" inside the Mask folder), give the folder back once with `sudo chown -R "$USER" ~/Mask`, then run the installer again. |
 | Windows: the installer says a Microsoft component is missing, or an error mentions `DLL load failed`, `WinError 126` or `onnxruntime_pybind11_state` | The installer offers to install it (Microsoft's free Visual C++ Redistributable): press Enter, then click **Yes** when Windows asks for permission. The permission prompt can open behind other windows: look for it on the taskbar. If that fails, download it from `https://aka.ms/vs/17/release/vc_redist.x64.exe`, run it, restart the computer, and run the installer again. |
 | *"Installing the packages failed, 3 times"* or another download error during the install | An internet problem. Check the connection and run the installer again: it keeps what it downloaded. On school, work or some country networks, `pypi.org` or `files.pythonhosted.org` may be blocked: try another network. |
-| The install looks stuck | A download can pause for a minute; wait. On Windows, if the window title starts with "Select", press Esc (clicking the window pauses it). |
+| The install looks stuck | A download can pause for a minute; wait. On Windows, if the window title starts with "Select", press Esc. |
 | A warning about a long path, OneDrive, iCloud, Dropbox or special characters | Move the folder to `C:\Mask` (Windows) or the home folder (Mac and Linux), then run the installer again with `--repair`. |
 | *"The installation doesn't load"* | Run the installer again with `--repair` (Windows: `./install-windows.bat --repair`; Mac and Linux: `bash install.sh --repair`). |
 | *"Mask isn't installed yet"* | Run the installer (section 2). If it ran, look at the end of its window or `install-log.txt` for the error. |
@@ -306,7 +306,7 @@ Mask uses Meta's SAM 2.1 models (Apache License 2.0), converted to the ONNX form
 | What happens | What to do |
 |---|---|
 | The browser doesn't open by itself | Open the address the window shows, for example `http://127.0.0.1:7861`. |
-| The page says it can't connect, or stops responding | The window that runs Mask was closed: start Mask again (section 3). On Windows, if that window's title starts with "Select", press Esc in it: a click there paused Mask. |
+| The page says it can't connect, or stops responding | The window that runs Mask was closed: start Mask again (section 3). On Windows, if that window's title starts with "Select", press Esc in it. |
 | Mac: a message asks whether Terminal may access files in the Desktop, Documents or Downloads folder | Click **Allow**: macOS asks before a program reads those folders. If it was refused, turn it on in System Settings > **Privacy & Security** > **Files and Folders** > Terminal, or drop the video on the page instead of pasting its path. |
 | *"Open a video first"* | Drop a video on the page, or paste its path and press Enter. |
 | *"This file can't be opened as a video"* | The file is damaged or isn't a video. Convert it with another program (for example HandBrake) and open the copy. |

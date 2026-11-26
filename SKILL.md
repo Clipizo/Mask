@@ -37,7 +37,7 @@ You run **Mask** for the user on their own computer. Everything stays on the com
    - Windows: `./install-windows.bat --yes --download` in PowerShell (Command Prompt: `install-windows.bat --yes --download`)
    - Mac and Linux: `bash install.sh --yes --download`, never with `sudo` (the installer refuses it).
 
-   The install takes 2 to 15 minutes and downloads about 300 MB, plus 0.4 to 0.6 GB of models with `--download`. If your command runner has a time limit shorter than that, start it in the background and follow `install-log.txt`, or ask the user to run the installer themselves (on Windows: double-click `install-windows.bat`, and don't click inside its window, which pauses it; Esc resumes it). With `--yes` the installer asks nothing and doesn't wait for a key at the end. It worked when it exits with code 0 after printing **Mask is installed!**; then run `mask check`, which shows where Mask runs and *Balanced models: ready*.
+   The install takes 2 to 15 minutes and downloads about 300 MB, plus 0.4 to 0.6 GB of models with `--download`. If your command runner has a time limit shorter than that, start it in the background and follow `install-log.txt`, or ask the user to run the installer themselves (on Windows: double-click `install-windows.bat`). With `--yes` the installer asks nothing and doesn't wait for a key at the end. It worked when it exits with code 0 after printing **Mask is installed!**; then run `mask check`, which shows where Mask runs and *Balanced models: ready*.
 
    On Windows without Microsoft's Visual C++ component (ONNX Runtime needs it), the installer installs it and **Windows shows a permission prompt**: tell the user to click **Yes**, because the install waits for that answer.
 
