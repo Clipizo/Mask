@@ -6,10 +6,11 @@ monetized videos. What you make with it, such as masks, mattes and cut-out video
 
 NO REDISTRIBUTION. You may not share, re-upload, redistribute, resell, rent or sublicense its files, on their own
 or as part of another pack, product or download, whether modified or not. Being free of charge does not make it
-free to redistribute. To recommend it, link to its page (https://github.com/Clipizo/Mask or clipizo.com).
+free to redistribute. To recommend it, link to its page (https://github.com/Clipizo/Mask or clipizo.com). Viewing
+and forking it on GitHub, as GitHub's terms allow its users, is permitted.
 
-NO REVERSE ENGINEERING. You may not reverse engineer, decompile, disassemble, decrypt or unpack it, try to extract
-its source code, protected modules or assets, or reuse its code in another product.
+SOURCE CODE. Mask's source code is public so you can see what it does on your computer, and you may change your own
+copy for your own use. You may not reuse its code, in whole or in part, in another product.
 
 THIRD-PARTY SOFTWARE. Mask downloads and runs third-party software and AI models, such as SAM 2.1 (Apache License
 2.0, by Meta), ONNX Runtime and other open-source packages. They are not part of this product and this license does
